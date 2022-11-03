@@ -1,0 +1,33 @@
+{
+    "swagger": "2.0",
+    "info": {
+      "version": "1.0.0",
+      "title": "Ecommerce API",
+      "description": "Ecommerce API",
+      "license": {
+        "name": "MIT",
+        "url": "https://opensource.org/licenses/MIT"
+      }
+    },
+    "host": "localhost:5001",
+    "basePath": "/api/v1",
+    "schemes": [
+      "http"
+    ],
+    "consumes": [
+      "application/json"
+    ],
+    "produces": [
+      "application/json"
+    ],
+    "securityDefinitions":{
+        "bearerAuth": {
+            "name": "Authorization",
+            "in": "header",
+            "type": "apiKey",
+            "description": "JWT Authorization header"
+          }
+        
+    },
+    "security": [ { "bearerAuth": [] } ]     
+}
