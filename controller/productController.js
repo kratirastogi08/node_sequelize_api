@@ -1,4 +1,4 @@
-const db = require("../db/db.config");
+const db = require("../db/db.config.js");
 const Products=db.products
 const Category=db.category
 const response=require("../CommonResponse/response")
@@ -47,7 +47,7 @@ const updateProduct=async(req,res,next)=>{
          {
            return response.error(res,400,"No product found")
          }
-         await Products.update({description},{where:{id}})
+         await Products.update({...req.body},{where:{id}})
          response.success(res,200,"Product updated successfully")
     }
     catch(err)

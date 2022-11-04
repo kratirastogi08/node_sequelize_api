@@ -3,6 +3,7 @@ const app = express();
 const cors=require('cors');
 const productRouter=require('./routes/productRouter')
 const userRouter=require('./routes/userRouter')
+const orderRouter=require('./routes/orderRouter')
 const db=require('./db/db.config')
 const dotenv=require('dotenv')
 const swaggerUI=require("swagger-ui-express")
@@ -23,6 +24,7 @@ const specs=swaggerJsDoc(options)
 app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(specs))
 app.use("/api/v1/user",userRouter)
 app.use("/api/v1/product",productRouter)
+app.use("/api/v1/order",orderRouter)
  
  
 app.listen(5001,()=>{

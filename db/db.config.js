@@ -24,15 +24,29 @@ db.sequelize=sequelize;
 db.sequelize.sync().then(()=>{
    console.log("table created successfully")
 })
+
 require('../Models/user')(sequelize)
 require('../Models/product')(sequelize)
 require('../Models/category')(sequelize)
+require('../Models/address')(sequelize)
+require('../Models/order')(sequelize)
+require('../Models/orderItem')(sequelize)
 
 db.users=sequelize.models.User
 db.products=sequelize.models.Product
 db.category=sequelize.models.Category
-db.category.hasMany(db.products);
-db.products.belongsTo(db.category)
+db.address=sequelize.models.Address
+db.orders=sequelize.models.Order
+db.orderItems = sequelize.models.order_items
+
+db.category.hasMany(db.products,{foreignKey:'categoryId'});
+db.products.belongsTo(db.category,{forignKey:'categoryId'});
+
+db.users.associate(db);
+db.address.associate(db);
+db.orders.associate(db);
+db.orderItems.associate(db)
+
 
 
 

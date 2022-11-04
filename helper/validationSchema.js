@@ -17,7 +17,8 @@ const signupSchema = Joi.object().keys({
         return errors;
       }),
      email: Joi.string().email().required().empty(''),
-     password:Joi.string().min(3).max(15).required().empty('')
+     password:Joi.string().min(3).max(15).required().empty(''),
+     role:Joi.string().optional().empty(''),
 })
 
 const signInSchema = Joi.object().keys({

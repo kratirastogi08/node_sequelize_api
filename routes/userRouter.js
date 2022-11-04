@@ -3,6 +3,7 @@ const router=express.Router();
 const userController=require('../controller/userController')
 const {validate}= require('../middleware/validation')
 const {signupSchema,signInSchema}=require('../helper/validationSchema')
+const {authentcation}=require('../middleware/authentication');
 
 
 /**
@@ -72,4 +73,6 @@ const {signupSchema,signInSchema}=require('../helper/validationSchema')
  */
 router.post('/signup',validate(signupSchema),userController.registration)
 router.post('/login',validate(signInSchema),userController.login)
+router.post("/createAddress",authentcation,userController.updateAddress)
+router.put("/updateAddress/:id",authentcation,userController.updateAddress)
 module.exports=router;

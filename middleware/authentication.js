@@ -1,6 +1,6 @@
 const jwt= require('jsonwebtoken');
 const response=require('../CommonResponse/response')
-const db = require("../db/db.config");
+const db = require("../db/db.config.js");
 const Users = db.users;
 const authentcation=(req,res,next)=>{
    try{

@@ -42,5 +42,13 @@ module.exports=async (sequelize)=>{
       updatedAt:false,
 
     })
+
+    User.associate = function (models) {
+      console.log(models)
+
+      User.hasMany(models.orders,{foreignKey:"userId"});
+      User.hasMany(models.address,{foreignKey:"userId"}); 
+  };
+  console.log("user",User)
     return User;
 }

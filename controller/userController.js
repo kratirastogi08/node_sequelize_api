@@ -1,15 +1,16 @@
-const db = require("../db/db.config");
+const db = require("../db/db.config.js");
 const bcrypt=require('bcrypt');
 const Users = db.users;
+const Address=db.address;
 const response=require('../CommonResponse/response')
 const jwt=require('jsonwebtoken');
 
 const registration = async (req,res,next) => {
     try{
         const { firstName, lastName, password, email, phone,role } = req.body;
+        const userRole=role||"user"
         const hashedPassword=await bcrypt.hash(password,10)
-        
-         const newUser= await db.sequelize.query(`INSERT INTO "Users" ("firstName", "lastName","email","password","phone","token","role") VALUES ('${firstName}', '${lastName}', '${email}', '${hashedPassword}', '${phone}',null,'${role}')
+        const newUser= await db.sequelize.query(`INSERT INTO "Users" ("firstName", "lastName","email","password","phone","token","role") VALUES ('${firstName}', '${lastName}', '${email}', '${hashedPassword}', '${phone}',null,'${userRole}')
          ON CONFLICT ON CONSTRAINT "Users_pkey" DO NOTHING RETURNING *`)
          const token=jwt.sign({userId:newUser[0][0].id},process.env.SECRET_KEY,{expiresIn:"1d"})
          await Users.update({token},{where:{id:newUser[0][0].id}})
@@ -42,7 +43,35 @@ const login=async(req,res,next)=>{
 
 }
 
+const updateAddress=async(req,res,next)=>{
+  try{
+    const {userId}=req.user;
+    const {id}=req.params
+     if(id===undefined)
+     {
+     const newAddress= await Address.create({
+        ...req.body,
+        userId
+      })
+      return response.success(res,200,"Address created successfully")
+     }
+
+       const addrs= await Address.findAll({where:{id,userId}})
+       if(!addrs)
+       {
+        response.error(res,400,"No such entity found");
+       }
+       await Address.update({...req.body},{where:{id}})
+       response.success(res,200,"Address updated successfully")       
+  }
+  catch(err){
+    console.log(err)
+       response.error(res, 400,err.name)
+  }
+}
+
 module.exports = {
   registration,
-  login
+  login,
+  updateAddress
 };
