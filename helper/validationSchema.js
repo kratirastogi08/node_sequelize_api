@@ -5,7 +5,7 @@ const signupSchema = Joi.object().keys({
     lastName:Joi.string().required().empty(''),
     phone:Joi.string().regex(/^[7-9]{1}[0-9]{9}$/).required().empty('').error(errors => {
         errors.forEach(err => {
-            console.log(err)
+            //console.log(err)
           switch (err.type) {
             case "string.regex.base":
               err.message = "Invalid phone number!";
@@ -31,16 +31,16 @@ const productSchema = Joi.object().keys({
     description:Joi.string().required().empty(''),
     quantity:Joi.number().required(),
     price:Joi.number().required(),
-    CategoryId:Joi.number().required()
+    images:Joi.array().required(),
+    categoryId:Joi.number().required()
 })
 
 const updateProductSchema=Joi.object().keys({
-    id:Joi.number().required(),
     title: Joi.string().optional(),
     description:Joi.string().optional(),
     quantity:Joi.number().optional(),
     price:Joi.number().optional(),
-    CategoryId:Joi.number().optional()
+    categoryId:Joi.number().optional()
 })
 
 module.exports={

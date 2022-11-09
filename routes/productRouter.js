@@ -105,6 +105,10 @@ const { validate } = require('../middleware/validation');
 router.post('/createCategory',authentcation,authorizedRoles(['admin']),productController.updateCategory)
 router.post('/createProduct',authentcation,authorizedRoles(['admin']),validate(productSchema),productController.updateProduct)
 router.put('/updateCategory',authentcation,authorizedRoles(['admin']),productController.updateCategory)
-router.put('/updateProduct',authentcation,authorizedRoles(['admin']),validate(updateProductSchema),productController.updateProduct)
+router.put('/updateProduct/:id',authentcation,authorizedRoles(['admin']),validate(updateProductSchema),productController.updateProduct)
 router.get('/getProducts',productController.getProducts)
+router.post("/createRatings",productController.productRatings)
+router.put("/updateRatings",productController.productRatings)
+router.get("/getProductRatings/:productId",productController.getProductRatings)
+router.get("/getAvgRating",productController.getAvgRating)
 module.exports=router

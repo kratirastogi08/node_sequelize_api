@@ -75,4 +75,6 @@ router.post('/signup',validate(signupSchema),userController.registration)
 router.post('/login',validate(signInSchema),userController.login)
 router.post("/createAddress",authentcation,userController.updateAddress)
 router.put("/updateAddress/:id",authentcation,userController.updateAddress)
+router.post("/forgotPassword",userController.forgotPassword)
+router.put("/reset/:token",userController.resetPassword)
 module.exports=router;

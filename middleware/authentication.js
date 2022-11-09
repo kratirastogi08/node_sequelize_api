@@ -4,13 +4,13 @@ const db = require("../db/db.config.js");
 const Users = db.users;
 const authentcation=(req,res,next)=>{
    try{
-    console.log(req.headers)
+   // console.log(req.headers)
     let token=req.headers.authorization;
     if(!token){
       response.error(res,400,"MISSING TOKEN")
     }  
     token=token.replace(/^Bearer\s+/,'')
-    console.log(token)
+    //console.log(token)
     jwt.verify(token,process.env.SECRET_KEY,async(error,decoded)=>{
      if(error)
      {
@@ -23,7 +23,7 @@ const authentcation=(req,res,next)=>{
      else
      {
       const user= await Users.findOne({ where: { token } })
-      console.log("user",user)
+      //console.log("user",user)
       
       if(user)
       {

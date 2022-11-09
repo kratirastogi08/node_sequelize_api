@@ -1,0 +1,15 @@
+SELECT department_name, COUNT(employee_id) FROM employees e INNER JOIN departments d USING (department_id) GROUP BY (department_name);
+SELECT first_name || ' ' ||last_name AS full_name from employees ;
+SELECT employee_id, to_char(hire_date,'MONTH DD,YYYY')from employees;
+SELECT length(trim(first_name)) from employees;
+SELECT DISTINCT(department_id) FROM employees e INNER JOIN departments d USING (department_id);
+SELECT * from employees where employee_id NOT IN (100);
+SELECT COUNT(*) from employees where hire_date<'1989-11-21';
+SELECT e.first_name || ' works for '|| m.first_name from employees e INNER JOIN employees m on e.manager_id=m.employee_id;
+SELECT * from employees where EXTRACT(YEAR from age(CURRENT_DATE,hire_date))>27;
+SELECT * from employees where EXTRACT(YEAR from hire_date)=1987;
+SELECT employee_id, COUNT(employee_id) from employees GROUP BY(employee_id) HAVING COUNT(employee_id)>1;
+DELETE from employee where employee_id IN (select employee_id from (select employee_id,ROW_NUMBER()OVER(PARTITION BY employee_id
+ORDER BY employee_id) AS row_num FROM employee) t where t.row_num>1);
+select * from employees where salary>(select avg(salary) from employees);
+select department_id, department_name, cast(avg(salary) as INTEGER) from employees inner join departments using(department_id) group by(department_id,department_name) having avg(salary)>9000;

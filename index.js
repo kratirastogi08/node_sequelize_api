@@ -9,10 +9,17 @@ const dotenv=require('dotenv')
 const swaggerUI=require("swagger-ui-express")
 const swaggerDocument=require('./swagger.json')
 const swaggerJsDoc=require("swagger-jsdoc")
+const cloudinary = require("cloudinary");
+const upload=require('express-fileupload')
+const logger=require('./logger')
 dotenv.config()
 db.connectToDatabase()
-
-
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+app.use(upload())
 app.use(cors())
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
@@ -21,6 +28,31 @@ var options = {
     apis: ['./routes/*.js'],
   };
 const specs=swaggerJsDoc(options)
+app.get('/fileupload',(req,res)=>{
+  res.sendFile(__dirname+'/index.html')
+})
+app.post('/fileUpload',(req,res)=>{
+  console.log(req)
+    if(req.files)
+    {
+      console.log(req.files)
+      var file=req.files.file
+      var filename=file.name
+      file.mv('./uploads/'+filename,(err)=>{
+        if(err)
+        {
+          res.send(err)
+        }
+        else
+        {
+          res.send("File uploaded successfully")
+        }
+      })
+    }
+})
+// logger.info("text info")
+// logger.warn("text warn")
+// logger.error(new Error("something went wrong"))
 app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(specs))
 app.use("/api/v1/user",userRouter)
 app.use("/api/v1/product",productRouter)
