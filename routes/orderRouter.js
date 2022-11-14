@@ -13,6 +13,7 @@ router.get("/getOrder/:orderId",orderController.getOrderById)
 router.post("/pay",paymentController.pay)
 router.post("/subs",paymentController.subs)
 router.get("/allOrders",orderController.getAllOrders)
+router.post("/cardPay",paymentController.cardPay)
 
 module.exports=router
 

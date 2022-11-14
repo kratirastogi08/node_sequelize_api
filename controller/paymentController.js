@@ -80,7 +80,7 @@ const pay=async(req,res,next)=>{
       cancel_url: `http://localhost:5001/cancel.html`,
       
     });
-    console.log(session)
+   // console.log(session)
    return res.json({url:session.url})
     
   }
@@ -112,9 +112,108 @@ const subs= async (req, res, next) => {
   console.log(session)
   return res.json({url:session.url})
 }
+
+const webhook=async(req,res,next)=>{
+  console.log("res",req)
+  let signingSecret="whsec_8067fe04e43a0d9147de614b2126f8ecf4deda64e0faff55766507cf8241370a"
+  const payload=req.body
+  const sig=req.headers['stripe-signature']
+  let event;
+  try{
+       event=stripe.webhooks.constructEvent(payload,sig,signingSecret)
+       console.log(event)
+  }
+  catch(err)
+  {
+     console.log(err.message)
+    return response.error(res,400,"Failed")
+  }
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object;
+      console.log("pay",paymentIntent)
+      // Then define and call a function to handle the event payment_intent.succeeded
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+}
+
+const cardPay= async (req, res, next) => {
+  try {
+   
+    let intent;
+    if (req.body.payment_method_id) {
+      // Create the PaymentIntent
+      console.log("sd",req.body.payment_method_id)
+      intent = await stripe.paymentIntents.create({
+        payment_method: req.body.payment_method_id,
+        description:"jsxvsh",
+        payment_method_types: ['card'],
+        amount: 1099,
+        currency: 'usd',
+        shipping: {
+          name: 'Jenny Rosen',
+          address: {
+            line1: '510 Townsend St',
+            postal_code: '98140',
+            city: 'San Francisco',
+            state: 'CA',
+            country: 'US',
+          },
+        },
+        confirmation_method: 'manual',
+        confirm: true
+      });
+      console.log(intent)
+    } else if (req.body.payment_intent_id) {
+      intent = await stripe.paymentIntents.confirm(
+        req.body.payment_intent_id
+      );
+    }
+    // Send the response to the client
+    console.log(intent)
+    res.send(generateResponse(intent));
+  } catch (e) {
+    // Display error on client
+    console.log(e.message)
+    return res.send({ error: e.message });
+  }
+}
+
+
+const generateResponse = (intent) => {
+  // Note that if your API version is before 2019-02-11, 'requires_action'
+  // appears as 'requires_source_action'.
+  if (
+    intent.status === 'requires_action' &&
+    intent.next_action.type === 'use_stripe_sdk'
+  ) {
+    // Tell the client to handle the action
+    return {
+      requires_action: true,
+      payment_intent_client_secret: intent.client_secret
+    };
+  } else if (intent.status === 'succeeded') {
+    // The payment didn’t need any additional actions and completed!
+    // Handle post-payment fulfillment
+    return {
+      success: true
+    };
+  } else {
+    // Invalid status
+    return {
+      error: 'Invalid PaymentIntent status'
+    }
+  }
+};
 module.exports={
     stripePayment,
     stripeSubscription,
     pay,
-    subs
+    subs,
+    webhook,
+    cardPay,
 }
