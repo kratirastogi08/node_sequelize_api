@@ -1,9 +1,10 @@
-exports.error=async(res,code,message)=>{
+exports.error=async(res,code,message,err=null)=>{
   try{
    const response={
     success:false,
     status_code:code,
     message
+    
    }
    return res.status(code).json(response)
   }

@@ -1,5 +1,7 @@
 const response  = require("../CommonResponse/response");
 const db = require("../db/db.config.js");
+const Users = db.users;
+const Products=db.products;
 const stripe=require("stripe")('sk_test_51M0NEkSCv9Xi8MdA0RbkYymWj29nf5tw6DNgoQN4yPHLfkYhhjv4KGF1qo0MIPzlewDXc4c38HUNjGG5ypNLDGuw00ellrj7F0')
 
 const stripePayment=async(req,res,next)=>{
@@ -56,7 +58,63 @@ const stripeSubscription= async (req, res, next) => {
 
 }
 
+const pay=async(req,res,next)=>{
+  try{
+    const product=await Products.findOne({where:{id:req.body.productId}})
+    const user=await Users.findOne({where:{id:req.body.userId}})
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types:['card'],
+      customer_email:user.email,
+      line_items: [{
+        price_data: {
+          currency: 'INR',
+          product_data: {
+              name: product.title
+          },
+          unit_amount: product.price*100
+      },
+      quantity: req.body.quantity
+      }],
+      mode: 'payment',
+      success_url: `http://localhost:5001/success.html`,
+      cancel_url: `http://localhost:5001/cancel.html`,
+      
+    });
+    console.log(session)
+   return res.json({url:session.url})
+    
+  }
+  catch(err)
+  {
+     console.log(err)
+  }
+  
+}
+
+const subs= async (req, res, next) => {
+  const prices = await stripe.prices.list({
+    lookup_keys: ['lookupkey'],
+    expand: ['data.product'],
+  });
+  const session = await stripe.checkout.sessions.create({
+    billing_address_collection: 'auto',
+    line_items: [
+      {
+        price: prices.data[0].id,
+        quantity: 1,
+
+      },
+    ],
+    mode: 'subscription',
+    success_url: `http://localhost:5001/success.html`,
+    cancel_url: `http://localhost:5001/cancel.html`,
+  });
+  console.log(session)
+  return res.json({url:session.url})
+}
 module.exports={
     stripePayment,
-    stripeSubscription
+    stripeSubscription,
+    pay,
+    subs
 }

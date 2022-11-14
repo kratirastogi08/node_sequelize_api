@@ -12,6 +12,18 @@ const swaggerJsDoc=require("swagger-jsdoc")
 const cloudinary = require("cloudinary");
 const upload=require('express-fileupload')
 const logger=require('./logger')
+const multer=require('multer');
+const path=require('path')
+const helmet = require("helmet");
+const {databaseErrorHandler}=require("./middleware/errorHandler")
+const storage=multer.diskStorage({
+  destination:(req,file,cb)=>{
+    cb(null,'uploads')
+  },
+  filename:(req,file,cb)=>{
+    cb(null,Date.now()+path.extname(file.originalname))
+  }
+})
 dotenv.config()
 db.connectToDatabase()
 cloudinary.config({
@@ -19,8 +31,11 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-app.use(upload())
+const multerUpload=multer({storage})
+//app.use(upload())
+app.use(express.static('public'));
 app.use(cors())
+app.use(helmet());
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 var options = {
@@ -30,6 +45,16 @@ var options = {
 const specs=swaggerJsDoc(options)
 app.get('/fileupload',(req,res)=>{
   res.sendFile(__dirname+'/index.html')
+})
+app.post("/multer",multerUpload.single("file"),(req,res)=>{
+  console.log(req)
+  res.send("Image Upload")
+})
+app.get("/pay",function(req,res){
+  res.sendFile(__dirname+'/public/payment.html')
+})
+app.get("/subs",function(req,res){
+  res.sendFile(__dirname+'/public/subscription.html')
 })
 app.post('/fileUpload',(req,res)=>{
   console.log(req)
@@ -57,6 +82,7 @@ app.use("/api-docs",swaggerUI.serve,swaggerUI.setup(specs))
 app.use("/api/v1/user",userRouter)
 app.use("/api/v1/product",productRouter)
 app.use("/api/v1/order",orderRouter)
+app.use(databaseErrorHandler)
  
  
 app.listen(5001,()=>{

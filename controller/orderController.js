@@ -2,6 +2,7 @@ const db = require("../db/db.config.js");
 const Orders = db.orders;
 const OrderItems = db.orderItems;
 const Products = db.products;
+const Address=db.address;
 var randomstring = require("randomstring");
 
 const response = require("../CommonResponse/response");
@@ -10,6 +11,9 @@ const placeOrder = async (req, res, next) => {
   const t = await db.sequelize.transaction();
   try {
     const { userId } = req.user;
+    console.log("userId",userId)
+    const address= await Address.findOne({where:{userId}})    
+    console.log(address) 
     const { orderItems, ...rest } = req.body;
     const trackingNumber = randomstring.generate();
     let totalPrice = 0;
@@ -17,7 +21,7 @@ const placeOrder = async (req, res, next) => {
       totalPrice = totalPrice + i.price;
     });
     const order = await Orders.create(
-      { ...rest, userId, trackingNumber, totalPrice },
+      { ...rest, userId, trackingNumber, totalPrice,addressId:address.id, orderItems },
       { transaction: t }
     );
     for (let item of orderItems) {
@@ -40,7 +44,7 @@ const placeOrder = async (req, res, next) => {
   } catch (err) {
     console.log(err);
     await t.rollback();
-    response.error(res, 400, err.name);
+    next(err)
   }
 };
 
@@ -87,14 +91,19 @@ const getOrderById=async(req,res,next)=>{
     return response.success(res,200,"Order Details",order)
   }
   catch(err)
-  {
-console.log(err)
+  {   
+    next(err)
   }
  
+}
+const getAllOrders=async(req,res,next)=>{
+   const orders= await Orders.findAll({});
+   response.success(res,400,"orders",orders)
 }
 module.exports = {
   placeOrder,
   updateOrderStatus,
   cancelOrder,
-  getOrderById
+  getOrderById,
+  getAllOrders
 };

@@ -10,6 +10,9 @@ router.delete("/cancelOrder/:orderId",orderController.cancelOrder)
 router.post("/payment",authentcation,paymentController.stripePayment)
 router.post("/payment/subscription",authentcation,paymentController.stripeSubscription)
 router.get("/getOrder/:orderId",orderController.getOrderById)
+router.post("/pay",paymentController.pay)
+router.post("/subs",paymentController.subs)
+router.get("/allOrders",orderController.getAllOrders)
 
 module.exports=router
 

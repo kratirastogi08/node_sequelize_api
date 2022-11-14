@@ -8,7 +8,8 @@ const authentcation=(req,res,next)=>{
     let token=req.headers.authorization;
     if(!token){
       response.error(res,400,"MISSING TOKEN")
-    }  
+    } 
+    console.log(token) 
     token=token.replace(/^Bearer\s+/,'')
     //console.log(token)
     jwt.verify(token,process.env.SECRET_KEY,async(error,decoded)=>{

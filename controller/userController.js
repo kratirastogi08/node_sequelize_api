@@ -43,20 +43,27 @@ const registration = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
-  const user = await Users.findOne({ where: { email } });
-  if (!user) {
-    return response.error(res, 400, "Email or Password does not match");
+  try{
+    const { email, password } = req.body;
+    const user = await Users.findOne({ where: { email } });
+    if (!user) {
+      return response.error(res, 400, "User does not exist");
+    }
+    const decryptedPassword = user.isValidPassword(password);
+  
+    if (!decryptedPassword) {
+      return response.error(res, 400, "Email or Password does not match");
+    }
+    const token = Users.generateJWT();
+  
+    await Users.update({ token }, { where: { id: user.dataValues.id } });
+    response.success(res, 200, "user successfully logged in",data={token});
   }
-  const decryptedPassword = user.isValidPassword(password);
-
-  if (!decryptedPassword) {
-    return response.error(res, 400, "Email or Password does not match");
+  catch(err)
+  {
+      next(err) 
   }
-  const token = Users.generateJWT();
-
-  await Users.update({ token }, { where: { id: user.dataValues.id } });
-  response.success(res, 200, "user successfully logged in");
+  
 };
 
 const updateAddress = async (req, res, next) => {
@@ -79,7 +86,7 @@ const updateAddress = async (req, res, next) => {
     response.success(res, 200, "Address updated successfully");
   } catch (err) {
     console.log(err);
-    response.error(res, 400, err.name);
+    next(err)
   }
 };
 
@@ -116,6 +123,7 @@ const forgotPassword = async (req, res, next) => {
         console.log("Error sending email " + err);
       } else {
         console.log("Sent email successfully");
+        response.success(res,200,"Email sent successfully",link);
       }
     });
   });

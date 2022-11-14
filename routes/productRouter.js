@@ -111,4 +111,5 @@ router.post("/createRatings",productController.productRatings)
 router.put("/updateRatings",productController.productRatings)
 router.get("/getProductRatings/:productId",productController.getProductRatings)
 router.get("/getAvgRating",productController.getAvgRating)
+router.get("/general",productController.generalFn)
 module.exports=router

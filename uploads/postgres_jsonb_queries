@@ -1,0 +1,18 @@
+update "Cards" set data = data || '{"country": "India"}' where id=1;
+update "Cards" set data = data || '{"agent": {"bot":true}}';
+select data::jsonb ->'agent' from "Cards"
+select data::jsonb ->'agent'->'bot' from "Cards"
+select DISTINCT jsonb_object_keys(data::jsonb)from "Cards";
+select * from "Cards" where data->'finished' = 'false';
+SELECT jsonb_array_elements_text(data->'tags') AS tag 
+FROM "Cards"  
+WHERE id = 1; 
+SELECT data->'name' FROM "Cards" WHERE data->'tags' @> '["Office"]'::jsonb; 
+SELECT * FROM "Cards" WHERE data->'tags' @> '[{"count": 18}]';
+SELECT data::jsonb @> '{"ingredients": []}'::jsonb, id FROM "Cards";  
+SELECT COUNT(*) FROM "Cards" WHERE data ? 'name';  
+update "Cards"
+  set data = jsonb_set(data, '{tags}', data -> 'tags' || '["home"]');
+ update "Cards"
+  set data = jsonb_set(data, '{tags}', data -> 'tags' || '[{"id":1111}]')
+ WHERE data @> '{"name": "Cook lunch"}'

@@ -63,7 +63,7 @@ module.exports = async (sequelize) => {
     User.hasMany(models.productRatings, { foreignKey: "userId" });
   };
   User.prototype.isValidPassword = function (password) {
-    bcrypt.compareSync(password, this.password);
+   return bcrypt.compareSync(password, this.password);
   };
 
   User.prototype.generatePasswordReset = function () {
